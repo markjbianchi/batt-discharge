@@ -1,0 +1,15 @@
+{
+    "serial": 320048526,
+    "period": 10,
+    "channels": [
+        {
+            "id": 0,
+            "enabled": true,
+            "adc_in": 0,
+            "discharge_out": 0,
+            "load": 751,
+            "prev_discharge": 0,
+        }
+    ]
+
+}
