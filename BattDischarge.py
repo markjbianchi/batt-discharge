@@ -4,8 +4,8 @@ import u3
 class BattDischarge:
     def __init__(self, channels, ser_num=None):
         self.channel = []
-        for idx, dic in enumerate(channels):
-            self.channel[idx] = {
+        for i, dic in enumerate(channels):
+            self.channel[i] = {
                 'adc': dic['adc_in'], 'load_en': dic['load_enable'], 'load': dic['load_ohms']
             }
         self.d = u3.U3(debug=True)

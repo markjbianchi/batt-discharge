@@ -1,7 +1,7 @@
 {
     "serial": 320048526,
-    "period": 10,
-    "channel": [
+    "period_secs": 10,
+    "channels": [
         {
             "id": 0,
             "enabled": true,

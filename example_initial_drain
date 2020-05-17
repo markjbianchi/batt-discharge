@@ -1,8 +1,8 @@
 {
-  "channel": [
+  "channels": [
     {
       "id": 0,
-      "coulombs": 0,
+      "coulombs": 0
     },
     {
       "id": 1,
@@ -18,7 +18,7 @@
     },
     {
       "id": 4,
-      "coulombs": 0,
+      "coulombs": 0
     },
     {
       "id": 5,

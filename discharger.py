@@ -3,7 +3,6 @@ import signal
 import time
 import sys
 import argparse
-import csv
 import BattDischarge
 import json
 
@@ -26,18 +25,34 @@ def exit_gracefully(signum, frame):
 
 def cleanup():
     # Turn off all loads and anything else to LJ
-    pass
+    bd.disable_all_loads()
 
 
-def configure_lj(cfg):
-    pass
+def measure_channels(dacq, chan, cfg):
+    return [0], [0]
 
 
-def run_program(cfg):
-    # Print setup, config, etc. Prompt to start or quit.
-    while True:
-        time.sleep(1)
-        print("a")
+def output_measurements(v, c):
+    print('{}'.format(time.time()), end='')
+    for vv, cc in zip(v, c):
+        print(',{:.3f},{:.3f}'.format(vv, cc), end='')
+    print('')
+
+
+def initialize_configs(cfg_file, drain_file):
+    chan = []
+    with open(cfg_file) as cfg_file:
+        cfg = json.load(cfg_file)
+    for dic in cfg.get('channel'):
+        chan.append(dict(dic))
+    v = [0] * len(chan)
+    c = [0] * len(chan)
+    if drain_file is not None:
+        with open(drain_file) as d:
+            drain = json.load(drain_file)
+        for idx, d in enumerate(drain.get('channels')):
+            c[idx] = d.get('coulombs')
+    return chan, v, c, cfg.get('period_secs')
 
 
 if __name__ == '__main__':
@@ -45,14 +60,27 @@ if __name__ == '__main__':
     original_sigint = signal.getsignal(signal.SIGINT)
     signal.signal(signal.SIGINT, exit_gracefully)
 
-    parser = argparse.ArgumentParser(description='Controls LabJack U3-HV to')
+    parser = argparse.ArgumentParser(description='Discharges batteries to fixed cutoffs using LabJack U3-HV')
     parser.add_argument('cfg_file', help='configuration file to set up data acquisition')
-    parser.add_argument('dischrg_init', nargs='?', default='None', help='file containing previous discharge amounts')
+    parser.add_argument('drain_init', nargs='?', default='None', help='file containing previous drain amounts')
     parser.add_argument('--dry_run', action='store_true', help='option flag to just show output without discharging')
     args = parser.parse_args()
 
-    with open(args.cfg_file) as cfg_file:
-        cfg = json.load(cfg_file)
-    configure_lj(cfg)
-    run_program(cfg)
+    # Use supplied config file to initialize an array of channel specifiers,
+    # and voltage & coulomb counter arrays.
+    channels, volts, coulombs, period = initialize_configs(args.cfg_file, args.drain_init)
+    num_chan = len(channels)
+
+    bd = BattDischarge.BattDischarge(channels)
+    bd.disable_all_loads()
+
+    volts, coulombs = measure_channels(bd, channels, coulombs)
+    output_measurements(volts, coulombs)
+    if not args.dry_run:
+        enable_loads(bd, channels)
+    while True:
+        time.sleep(period)
+        volts, coulombs = measure_channels(bd, channels, coulombs)
+        output_measurements(volts, coulombs)
+        monitor_cutoffs(bd, channels, volts, coulombs)
 
