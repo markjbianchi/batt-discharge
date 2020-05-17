@@ -17,7 +17,7 @@ class BattDischarge:
         #self.dacq.open(serial=ser_num)
         self.dacq.configU3(FIOAnalog=0xFF, EIODirection=0xFF, EIOState=0x00)
         self.dacq.configIO(FIOAnalog=0xFF, EIOAnalog=0)
-        #>>> d.getFeedback(u3.LED(State = False))
+        #self.dacq.getFeedback(u3.LED(State=False))
 
     def _ctrl_load(self, chan, level):
         if chan < len(self.channels):
@@ -40,7 +40,7 @@ class BattDischarge:
             self.dacq.setDOState(dic['load_pin'], 0)
             self.channels[idx].update({'enabled': False})
 
-    def measure_channel(self, chan, avgs=0, msec_delay=50):
+    def measure_channel(self, chan):
         if chan < len(self.channels):
             v = self.dacq.getAIN(self.channels[chan].get('adc_pin'))
             if self.channels[chan].get('enabled'):

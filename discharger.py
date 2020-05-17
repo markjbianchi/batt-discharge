@@ -12,11 +12,12 @@ def exit_gracefully(signum, frame):
     # in input when CTRL+C is pressed, and the signal handler is not re-entrant
     signal.signal(signal.SIGINT, original_sigint)
     try:
-        if input("\nReally quit? (y/n)> ").lower().startswith('y'):
+        print("\nReally quit? (y/n) ", end='', file=sys.stderr)
+        if input().lower().startswith('y'):
             cleanup()
             sys.exit(1)
     except KeyboardInterrupt:
-        print("Ok ok, quitting")
+        print("Ok ok, quitting", file=sys.stderr)
         cleanup()
         sys.exit(1)
     # restore the exit gracefully handler here
@@ -55,6 +56,7 @@ def output_measurements(v, c):
     for vv, cc in zip(v, c):
         print(',{:.3f},{:.3f}'.format(vv, cc), end='')
     print('')
+    sys.stdout.flush()
 
 
 def initialize_configs(cfg_file, drain_file):
