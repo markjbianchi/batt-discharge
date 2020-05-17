@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import signal
-import time
 import sys
 import argparse
-import BattDischarge
+import time
 import json
+import BattDischarge
 
 
 def exit_gracefully(signum, frame):
@@ -26,14 +26,32 @@ def exit_gracefully(signum, frame):
 def cleanup():
     # Turn off all loads and anything else to LJ
     bd.disable_all_loads()
+    bd.close()
 
 
-def measure_channels(dacq, chan, cfg):
-    return [0], [0]
+def enable_loads(dacq, chan):
+    for idx, dic in enumerate(chan):
+        if dic.get('enabled'):
+            dacq.enable_load(idx)
+
+
+def measure_channels(dacq, chan, secs, coul):
+    volt = []
+    for idx, dic in enumerate(chan):
+        v, i = dacq.measure_channel(idx)
+        volt.append(v)
+        coul[idx] += i * secs
+    return volt, coul
+
+
+def monitor_cutoffs(dacq, chan, v, coul):
+    for idx, dic in enumerate(chan):
+        if v[idx] < dic.get('cutoff_v') or coul[idx] > dic.get('cutoff_c'):
+            dacq.disable_load(idx)
 
 
 def output_measurements(v, c):
-    print('{}'.format(time.time()), end='')
+    print('{}'.format(int(time.time())), end='')
     for vv, cc in zip(v, c):
         print(',{:.3f},{:.3f}'.format(vv, cc), end='')
     print('')
@@ -41,18 +59,17 @@ def output_measurements(v, c):
 
 def initialize_configs(cfg_file, drain_file):
     chan = []
-    with open(cfg_file) as cfg_file:
-        cfg = json.load(cfg_file)
-    for dic in cfg.get('channel'):
+    with open(cfg_file) as cf:
+        cfg = json.load(cf)
+    for dic in cfg.get('channels'):
         chan.append(dict(dic))
-    v = [0] * len(chan)
     c = [0] * len(chan)
     if drain_file is not None:
-        with open(drain_file) as d:
-            drain = json.load(drain_file)
-        for idx, d in enumerate(drain.get('channels')):
-            c[idx] = d.get('coulombs')
-    return chan, v, c, cfg.get('period_secs')
+        with open(drain_file) as df:
+            drain = json.load(df)
+        for idx, cc in enumerate(drain.get('coulombs')):
+            c[idx] = cc
+    return chan, c, cfg.get('period_secs')
 
 
 if __name__ == '__main__':
@@ -62,25 +79,26 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Discharges batteries to fixed cutoffs using LabJack U3-HV')
     parser.add_argument('cfg_file', help='configuration file to set up data acquisition')
-    parser.add_argument('drain_init', nargs='?', default='None', help='file containing previous drain amounts')
+    parser.add_argument('drain_init', nargs='?', help='file containing previous drain amounts')
     parser.add_argument('--dry_run', action='store_true', help='option flag to just show output without discharging')
     args = parser.parse_args()
 
     # Use supplied config file to initialize an array of channel specifiers,
-    # and voltage & coulomb counter arrays.
-    channels, volts, coulombs, period = initialize_configs(args.cfg_file, args.drain_init)
+    # and coulomb counter array.
+    channels, coulombs, period = initialize_configs(args.cfg_file, args.drain_init)
     num_chan = len(channels)
 
     bd = BattDischarge.BattDischarge(channels)
     bd.disable_all_loads()
 
-    volts, coulombs = measure_channels(bd, channels, coulombs)
+    # Take an initial measurement and print it; if not a dry run, enable the loads.
+    # Then enter loop which measures V & I and computes cumulative charge drawn.
+    volts, coulombs = measure_channels(bd, channels, 0, coulombs)
     output_measurements(volts, coulombs)
     if not args.dry_run:
         enable_loads(bd, channels)
     while True:
         time.sleep(period)
-        volts, coulombs = measure_channels(bd, channels, coulombs)
+        volts, coulombs = measure_channels(bd, channels, period, coulombs)
         output_measurements(volts, coulombs)
         monitor_cutoffs(bd, channels, volts, coulombs)
-

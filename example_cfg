@@ -3,76 +3,68 @@
     "period_secs": 10,
     "channels": [
         {
-            "id": 0,
             "enabled": true,
             "adc_in": 0,
             "load_enable": 8,
             "load_ohms": 751,
-            "cutoff_V": 2.00,
-            "cutoff_C": 2000.0
+            "cutoff_v": 2.00,
+            "cutoff_c": 2000.0
         },
         {
-            "id": 1,
             "enabled": true,
             "adc_in": 1,
             "load_enable": 9,
             "load_ohms": 744,
-            "cutoff_V": 2.00,
-            "cutoff_C": 2000.0
+            "cutoff_v": 2.00,
+            "cutoff_c": 2000.0
         },
         {
-            "id": 2,
             "enabled": true,
             "adc_in": 2,
             "load_enable": 10,
             "load_ohms": 751,
-            "cutoff_V": 2.00,
-            "cutoff_C": 2000.0
+            "cutoff_v": 2.00,
+            "cutoff_c": 2000.0
         },
         {
-            "id": 3,
             "enabled": true,
             "adc_in": 3,
             "load_enable": 11,
             "load_ohms": 744,
-            "cutoff_V": 2.00,
-            "cutoff_C": 2000.0
+            "cutoff_v": 2.00,
+            "cutoff_c": 2000.0
         },
         {
-            "id": 4,
             "enabled": true,
             "adc_in": 4,
             "load_enable": 12,
             "load_ohms": 751,
-            "cutoff_V": 2.00,
-            "cutoff_C": 2000.0
+            "cutoff_v": 2.00,
+            "cutoff_c": 2000.0
         },
         {
-            "id": 5,
             "enabled": true,
             "adc_in": 5,
             "load_enable": 13,
             "load_ohms": 747,
-            "cutoff_V": 2.00,
-            "cutoff_C": 2000.0
+            "cutoff_v": 2.00,
+            "cutoff_c": 2000.0
         },
         {
-            "id": 6,
             "enabled": true,
             "adc_in": 6,
             "load_enable": 14,
             "load_ohms": 750,
-            "cutoff_V": 2.00,
-            "cutoff_C": 2000.0
+            "cutoff_v": 2.00,
+            "cutoff_c": 2000.0
         },
         {
-            "id": 7,
             "enabled": true,
             "adc_in": 7,
             "load_enable": 15,
             "load_ohms": 755,
-            "cutoff_V": 2.00,
-            "cutoff_C": 2000.0
+            "cutoff_v": 2.00,
+            "cutoff_c": 2000.0
         }
     ]
 }
