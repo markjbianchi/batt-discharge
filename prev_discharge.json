@@ -1,0 +1,36 @@
+{
+  "channel": [
+    {
+      "id": 0,
+      "coulombs": 0,
+    },
+    {
+      "id": 1,
+      "coulombs": 0
+    },
+    {
+      "id": 2,
+      "coulombs": 0
+    },
+    {
+      "id": 3,
+      "coulombs": 0
+    },
+    {
+      "id": 4,
+      "coulombs": 0,
+    },
+    {
+      "id": 5,
+      "coulombs": 0
+    },
+    {
+      "id": 6,
+      "coulombs": 0
+    },
+    {
+      "id": 7,
+      "coulombs": 0
+    }
+  ]
+}
