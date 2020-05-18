@@ -47,7 +47,8 @@ class BattDischarge:
         self._handle_led()
 
     def measure_channel(self, chan):
-        v = self.dacq.getAIN(self.channels[chan].get('adc_pin'))
+        neg_chan = 31 if chan < 4 else 32
+        v = self.dacq.getAIN(self.channels[chan].get('adc_pin'), negChannel=neg_chan)
         if self.channels[chan].get('enabled'):
             i = v / self.channels[chan].get('load')
         else:
