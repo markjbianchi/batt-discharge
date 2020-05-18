@@ -17,14 +17,19 @@ class BattDischarge:
         #self.dacq.open(serial=ser_num)
         self.dacq.configU3(FIOAnalog=0xFF, EIODirection=0xFF, EIOState=0x00)
         self.dacq.configIO(FIOAnalog=0xFF, EIOAnalog=0)
-        #self.dacq.getFeedback(u3.LED(State=False))
+
+    def _handle_led(self):
+        # LED is on when any battery is being discharged
+        any_enabled = False
+        for dic in self.channels:
+            if dic.get('enabled'):
+                any_enabled = True
+        self.dacq.getFeedback(u3.LED(State=any_enabled))
 
     def _ctrl_load(self, chan, level):
-        if chan < len(self.channels):
-            self.dacq.setDOState(self.channels[chan].get('load_pin'), level)
-            self.channels[chan].update({'enabled': bool(level)})
-        else:
-            print('unable to affect load for channel {}'.format(chan))
+        self.dacq.setDOState(self.channels[chan].get('load_pin'), level)
+        self.channels[chan].update({'enabled': bool(level)})
+        self._handle_led()
 
     def close(self):
         self.dacq.close()
@@ -36,20 +41,18 @@ class BattDischarge:
         self._ctrl_load(chan, 0)
 
     def disable_all_loads(self):
-        for idx, dic in enumerate(self.channels):
+        for i, dic in enumerate(self.channels):
             self.dacq.setDOState(dic['load_pin'], 0)
-            self.channels[idx].update({'enabled': False})
+            self.channels[i].update({'enabled': False})
+        self._handle_led()
 
     def measure_channel(self, chan):
-        if chan < len(self.channels):
-            v = self.dacq.getAIN(self.channels[chan].get('adc_pin'))
-            if self.channels[chan].get('enabled'):
-                i = v / self.channels[chan].get('load')
-            else:
-                i = 0
-            return v, i
+        v = self.dacq.getAIN(self.channels[chan].get('adc_pin'))
+        if self.channels[chan].get('enabled'):
+            i = v / self.channels[chan].get('load')
         else:
-            return 0, 0
+            i = 0
+        return v, i
 
 
 if __name__ == '___main__':
