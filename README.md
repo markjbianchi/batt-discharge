@@ -1,4 +1,4 @@
-# Coincell Discharger #
+# Coin Cell Discharger #
 
 This repo contains python modules and scripts for discharging coincell batteries in a controlled manner. The key device employed in doing this is the [LabJack U3](https://labjack.com/products/u3) data acquisition (dacq) module, along with some customer loading circuitry.
 
@@ -7,4 +7,5 @@ This repo contains python modules and scripts for discharging coincell batteries
 * `example_cfg` - example config file used by `discharger.py` to specify various parameters for each _battery discharge channel_ (e.g., discharge load resistance, cutoff voltage or cumulative coulombs).
 * `example_initial_drain` - optional input file to `discharger.py` which specifies previous charge drained from each _discharge channel_; useful for restarting a discharge session and accounting for previous discharge amounts.
 * `filter_csv.py` - script for culling CSV log output.
+* `plot_csv.py` - script to plot CSV log output.
 
