@@ -10,8 +10,13 @@ parser = argparse.ArgumentParser(description='Plots battery discharge CSV log')
 parser.add_argument('csv_file', help='discharger log file to plot')
 parser.add_argument('--line_skips', type=int, default=0, help='number of input lines skipped per output line')
 parser.add_argument('--volts_only', action='store_true', help='strips out coulomb data')
+parser.add_argument('--yaxis', type=str, help='comma-separated list of battery numbers to plot (e.g., --yaxis=0,2,5)')
 args = parser.parse_args()
 
+if args.yaxis is None:
+    yaxis = [i for i in range(8)]
+else:
+    yaxis = [int(i) for i in args.yaxis.split(',')]
 in_data = np.genfromtxt(args.csv_file, delimiter=',')
 epoch_converter = np.vectorize(dt.datetime.fromtimestamp)
 time = epoch_converter(in_data[1:, 0])
@@ -32,8 +37,9 @@ else:
     gs = fig.add_gridspec(2, 1)
 
 axv = fig.add_subplot(gs[0, 0])
-for col, leg in zip(volts.T, legend_v):
-    axv.plot(time, col, label=leg)
+for i, (col, leg) in enumerate(zip(volts.T, legend_v)):
+    if i in yaxis:
+        axv.plot(time, col, label=leg)
 axv.set_title('Panasonic CR2450 Discharge')
 axv.set_ylabel('Battery Voltage (V)')
 axv.set_ylim(ymin=1.9, ymax=3.1)
@@ -42,8 +48,9 @@ axv.grid(True)
 
 if not args.volts_only:
     axc = fig.add_subplot(gs[1, 0])     # , sharex=True)
-    for col, leg in zip(coulombs.T, legend_c):
-        axc.plot(time, col, label=leg)
+    for i, (col, leg) in enumerate(zip(coulombs.T, legend_c)):
+        if i in yaxis:
+            axc.plot(time, col, label=leg)
     axc.set_ylabel('Battery Charge (C)')
     axc.set_xlabel('Date')
     axc.legend(loc='best')
