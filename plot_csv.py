@@ -40,7 +40,7 @@ axv = fig.add_subplot(gs[0, 0])
 for i, (col, leg) in enumerate(zip(volts.T, legend_v)):
     if i in yaxis:
         axv.plot(time, col, label=leg)
-axv.set_title('Panasonic CR2450 Discharge')
+axv.set_title('CR2450 Discharge Curves')
 axv.set_ylabel('Battery Voltage (V)')
 axv.set_ylim(ymin=1.9, ymax=3.1)
 axv.legend(loc='best')
